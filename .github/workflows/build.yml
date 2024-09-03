@@ -1,0 +1,23 @@
+name: Build Image
+on:
+  push: {}
+  workflow_dispatch: {}
+jobs:
+  build:
+    uses: uchiru/gha-workflows/.github/workflows/build.yml@master
+    with:
+      registry: ba-registry-uchiru.runit.cc
+    secrets:
+      registry_username: ${{ secrets.REGISTRY_UCHI_USERNAME }}
+      registry_password: ${{ secrets.REGISTRY_UCHI_PASSWORD }}
+  push-chart-to-registry:
+    needs: [build]
+    uses: uchiru/gha-workflows/.github/workflows/push-chart.yml@master
+    with:
+      chart_name: moodle
+      image_tag: ${{ needs.build.outputs.tag }}
+      image_registry: uchiru
+    secrets:
+      chart_registry_url: ${{ secrets.CHART_REGISTRY_URL }}
+      chart_registry_token: ${{ secrets.CHART_REGISTRY_TOKEN }}
+      chart_registry_pusher_url: ${{ secrets.CHART_REGISTRY_PUSHER_URL }}
